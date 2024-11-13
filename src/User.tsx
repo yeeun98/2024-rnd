@@ -1,7 +1,5 @@
 import styled from 'styled-components';
-import { useEffect, useRef } from 'react';
-import { useRecoilState } from 'recoil';
-import { isViewGolfzonSection } from './variable/atom';
+import { useEffect, useRef, useState } from 'react';
 
 // Props 타입 정의
 interface StickyDivProps {
@@ -13,21 +11,20 @@ const Common = styled.div`
   margin: auto;
 `;
 const Golfzon2024 = styled(Common)<StickyDivProps>`
-  height: 400px;
+  height: 100vh;
+  /* background-color: lightblue; */
   position: ${({ isAtTop }) => (isAtTop ? "fixed" : "static")};
   top: ${({ isAtTop }) => (isAtTop ? "0" : "auto")};
   left: ${({ isAtTop }) => (isAtTop ? "50%" : "auto")};
-  transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
-  background-color: beige;
+  transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%)" : "auto")};
 `;
 const Wrap = styled.div`
   min-height: 200vh;
-  background-color: antiquewhite;
 `;
 
-function Golfzon() {
+function User() {
   const golfzonRef = useRef<HTMLDivElement>(null);
-  const [isAtTop, setIsAtTop] = useRecoilState(isViewGolfzonSection);
+  const [isAtTop, setIsAtTop] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -55,8 +52,8 @@ function Golfzon() {
   }, []);
   
   return (
-    <Wrap ref={golfzonRef}>
-      <Golfzon2024 isAtTop={isAtTop}>
+    <Wrap>
+      <Golfzon2024 ref={golfzonRef} isAtTop={isAtTop}>
         <h1>Golfzon Component</h1>
         {/* Golfzon이 보일 때 상태 변화 */}
         {isAtTop && <p>Golfzon이 화면에 보이기 시작했습니다!</p>}
@@ -65,4 +62,4 @@ function Golfzon() {
   );
 }
 
-export default Golfzon;
+export default User;
