@@ -18,11 +18,11 @@ const Golfzon2024 = styled(Common)<StickyDivProps>`
   top: ${({ isAtTop }) => (isAtTop ? "0" : "auto")};
   left: ${({ isAtTop }) => (isAtTop ? "50%" : "auto")};
   transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
-  background-color: beige;
+  background-color: #03045E;
 `;
 const Wrap = styled.div`
   min-height: 200vh;
-  background-color: antiquewhite;
+  background-color: orange;
 `;
 
 function Golfzon() {

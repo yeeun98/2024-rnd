@@ -1,5 +1,6 @@
 import styled, { createGlobalStyle, keyframes } from 'styled-components';
 import Golfzon from './Golfzon';
+import GolfzonUser from './GolfzonUser';
 
 //#region styled component
 const GlobalStyle = createGlobalStyle`
@@ -60,38 +61,57 @@ const GlobalStyle = createGlobalStyle`
     text-decoration: none;
   }
 `;
-export const Common = styled.div`
+
+const TopSection = styled.div`
+  height: 860px;
+  background: url(/images/snow.png) no-repeat top, linear-gradient(#a3dbfd, #b5e4ff 10%,#b5e3fd 10%, #fff, #fff, #fff, #fff,  #fff, #fff, #b5e3fd, #b5e4ff);
+  background-size: cover;
+  padding: 30px 35px 0 35px;
+`;
+const MainImg = styled.div`
   width: 100%;
-  max-width: 580px;
-  margin: auto;
-`;
-const MainImg = styled(Common)`
+  max-width: 440px;
   position: relative;
-  height: 468px;
-  /* background: linear-gradient(#C8E9FE 10%, #fff, #fff); */
-  background: url(/images/title.png) no-repeat center center;
-  background-size: 100% 100%;
-  /* background-size: contain; */
-  /* background-size: 100% 100%,375px,1250px 567px;
-  background: linear-gradient(0deg, #07043a 0, transparent 30px, transparent), url(https://ssl.pstatic.net/static/m/comic/im/title_visual.png) no-repeat top, url(https://ssl.pstatic.net/static/m/comic/im/title_bg.png) no-repeat top; */
+  margin: auto;
+  overflow-x: hidden;
 `;
-const leftSideAni = keyframes`
+const Img = styled.img`
+  position: relative;
+  width: 100%;
+  object-fit: contain;
+  margin-top: 20px;
+`;
+const rightSideAni = keyframes`
   0% {top: 10px;}
 	100% {top: 15px;}
 `;
+const leftSideAni = keyframes`
+  0% {bottom: 28px;}
+	100% {bottom: 23px;}
+`;
 const TitleDecoration = styled.div`
-  right:50px;
-  animation: ${leftSideAni} 0.7s linear 0s infinite alternate;
-  width: 30px;
-  height: 30px;
+  width: 45px;
+  height: 45px;
   position: absolute;
   background-color: red;
+`;
+const RightDecoration = styled(TitleDecoration)`
+  right: 15px;
+  animation: ${rightSideAni} 0.7s linear 0s infinite alternate;
+`;
+const LeftDecoration = styled(TitleDecoration)`
+  animation: ${leftSideAni} 0.7s linear 0s infinite alternate;
 `;
 const Wrap = styled.div`
   width: 100%;
   height: 100vh;
-  /* background: linear-gradient(90deg, #07043a, rgba(7, 4, 58, 0) 452px, transparent 453px, transparent 828px, rgba(7, 4, 58, 0) 829px, #07043a) no-repeat bottom, linear-gradient(180deg, rgba(107, 29, 203, 0), rgba(27, 14, 119, .5) 50%, #020109) no-repeat bottom;; */
-  /* background: linear-gradient(to bottom, #59B7FB, #C8E9FE 300px, #ffffff 300px); */
+`;
+const Title = styled.div`
+  background: url(/images/title.png) no-repeat top;
+  position: relative;
+  z-index: 100;
+  height: 100px;
+  margin-top: -25px;
 `;
 //#endregion
 
@@ -99,18 +119,22 @@ function App() {
   return (
     <Wrap>
       <GlobalStyle />
-      <div style={{ height: '468px', background: 'linear-gradient(#C8E9FE 10%, #fff, #fff)'}}>
+      <TopSection>
         <MainImg>
-          {/* <img src="/images/title.png"/> */}
-          <TitleDecoration>
+          <Img src="/images/2024.png"/>
+          <RightDecoration>
             decoration
-          </TitleDecoration>
+          </RightDecoration>
+          <LeftDecoration>
+            decoration
+          </LeftDecoration>
         </MainImg>
-      </div>
+
+        <Title />
+      </TopSection>
       <Golfzon />
-      <div style={{height:'300vh'}}>
-        another section
-      </div>
+      <GolfzonUser />
+      <div style={{height: '100vh'}}></div>
     </Wrap>
   );
 }
