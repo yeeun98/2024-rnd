@@ -70,7 +70,7 @@ const TopSection = styled.div`
 `;
 const MainImg = styled.div`
   width: 100%;
-  max-width: 440px;
+  max-width: 560px;
   position: relative;
   margin: auto;
   overflow-x: hidden;
@@ -82,21 +82,24 @@ const Img = styled.img`
   margin-top: 20px;
 `;
 const rightSideAni = keyframes`
-  0% {top: 10px;}
-	100% {top: 15px;}
+  0% {top: 20px;}
+	100% {top: 25px;}
 `;
 const leftSideAni = keyframes`
   0% {bottom: 28px;}
 	100% {bottom: 23px;}
 `;
 const TitleDecoration = styled.div`
-  width: 45px;
-  height: 45px;
+  width: 90px;
+  height: 90px;
   position: absolute;
-  background-color: red;
+
+  img {
+    width: 100%;
+  }
 `;
 const RightDecoration = styled(TitleDecoration)`
-  right: 15px;
+  right: 25px;
   animation: ${rightSideAni} 0.7s linear 0s infinite alternate;
 `;
 const LeftDecoration = styled(TitleDecoration)`
@@ -108,10 +111,15 @@ const Wrap = styled.div`
 `;
 const Title = styled.div`
   background: url(/images/title.png) no-repeat top;
+  background-size: contain;
   position: relative;
   z-index: 100;
-  height: 100px;
+  min-width: 250px;
+  max-width: 500px;
+  min-height: 60px;
+  max-height: 160px;
   margin-top: -25px;
+  margin: -25px auto 0 auto;
 `;
 //#endregion
 
@@ -123,10 +131,10 @@ function App() {
         <MainImg>
           <Img src="/images/2024.png"/>
           <RightDecoration>
-            decoration
+            <img src="/images/snow-flake.png" />
           </RightDecoration>
           <LeftDecoration>
-            decoration
+            <img src="/images/snow-flake.png" />
           </LeftDecoration>
         </MainImg>
 
