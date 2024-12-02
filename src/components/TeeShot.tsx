@@ -9,7 +9,9 @@ const Wrap = styled(Frame)`
 function TeeShot() {
   
   return (
-    <Wrap></Wrap>
+    <Wrap>
+      
+    </Wrap>
   );
 }
 

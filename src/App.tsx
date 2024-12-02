@@ -1,7 +1,8 @@
 import styled from 'styled-components';
+import { GlobalStyle } from './GlobalStyle';
+
 import Golfzon from './components/Golfzon';
 import TopRanking from './components/TopRanking';
-import { GlobalStyle } from './GlobalStyle';
 import User from './components/User';
 import TopSection from './components/TopSection';
 import TeeShot from './components/TeeShot';

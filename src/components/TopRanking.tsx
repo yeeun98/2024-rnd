@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { isSecondView, isThirdView, isViewGolfzonSection } from '../variable/atom';
 import { Frame } from '../GlobalStyle';
 
 //#region props type
@@ -12,80 +10,116 @@ interface BoxDivProps {
   isAtTop?: boolean;
   isAtSecondTop?: boolean;
   isAtThirdTop?: boolean;
+  firstBoxTop?: string;
   order: 'first' | 'second' | 'third'
 }
 //#endregion
 
 //#region style-component
 const Wrap = styled(Frame)`
+  position: relative;
   min-height: 250dvh;
   overflow: hidden;
+`;
+const Title = styled.h1<StickyDivProps>`
+  text-align: center;
+  position: ${({ isAtTop }) => (isAtTop ? "fixed" : "static")};
+  width: 100%;
+  left: ${({ isAtTop }) => (isAtTop ? "50%" : "auto")};
+  transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
+  text-align: center;
+
+  h1 {
+      strong {
+        position: relative;
+        display: inline-block;
+        border-bottom: 4px solid #FFEE32;
+        padding-bottom: 2px;
+
+        em {
+          position: absolute;
+          background: url(/images/highlight.png) no-repeat;
+          background-size: contain;
+          height: 22px;
+          aspect-ratio: 1.5 /1;
+          left: -15px;
+          top: -22px;
+        }
+      }
+    }
 
   @media (max-width: 768px) {
-    h1 {
-      font-family: 'GmarketSansMedium', sans-serif; /* 글로벌 폰트 사용 */
-      font-size: 23px;
+    margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "100px")};
+    top: ${({ isAtTop }) => (isAtTop ? "100px" : "auto")};
 
+    h1 {
+      font-size: 23px;
+      
       strong {
         font-weight: 900;
+        font-size: 24px;
       }
     }
   }
-`;
-const Common = styled.div`
-  max-width: 860px;
-  margin: auto;
-  text-align: center;
-`;
-const Title = styled(Common)<StickyDivProps>`
-  position: ${({ isAtTop }) => (isAtTop ? "fixed" : "static")};
-  margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "80px")};
-  top: ${({ isAtTop }) => (isAtTop ? "80px" : "auto")};
-  left: ${({ isAtTop }) => (isAtTop ? "50%" : "auto")};
-  transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
-  width: 100%;
-  text-align: center;
-  grid-row: 1/2;
+
+  @media (min-width: 769px) {
+    margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "150px")};
+    top: ${({ isAtTop }) => (isAtTop ? "150px" : "auto")};
+
+    h1 {
+      strong {
+        font-weight: 900;
+        font-size: 36px;
+      }
+    }
+  }
 `;
 const Content = styled.ul<StickyDivProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: ${({ isAtTop }) => (isAtTop ? "220px" : "170px")};
-  position: relative;
+  /* margin-top: 220px; */
+  /* top: 50%; */
+  /* margin-top: auto; */
+  /* margin-top: ${({ isAtTop }) => (isAtTop ? "220px" : "170px")}; */
+  /* position: relative; */
 `;
 const Box = styled.li<BoxDivProps>`
   width: 80%;
   max-width: 500px;
-  height: 500px;
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   pointer-events: none;
   user-select: none;
+  
 
-  ${({ order, isAtTop, isAtSecondTop }) => {
+  ${({ order, isAtTop, isAtSecondTop, isAtThirdTop, firstBoxTop }) => {
     switch (order) {
       case 'first':
         return `
           background-color: #77CDFF;
           position: ${isAtTop ? 'fixed' : 'absolute'};
-          top: ${isAtTop ? '200px' : '0'};
+          top: ${isAtTop ? `${firstBoxTop}px` : '10%'};
+          // top: 10%;
+          // top: ${isAtTop ? '358px' : '10%'};
+          // transform: ${isAtTop ? '' : 'translate(-50%, -50%)'}; /* 요소의 중심을 기준으로 이동 */
           z-index: 1;
         `;
       case 'second':
         return `
           background-color: #3993DF;
-          // top: 720px;
           position: ${isAtSecondTop ? 'fixed' : 'absolute'};
           top: ${isAtSecondTop ? '200px' : '720px'};
           z-index: 2;
-          margin-top: 35px;
+          margin-top: 40px;
         `;
       case 'third':
         return `
           background-color: #1864A6;
-          position: absolute;
-          top: 1440px;
+          position: ${isAtThirdTop ? 'fixed' : 'absolute'};
+          top: ${isAtThirdTop ? '240px' : '1440px'};
           z-index: 3;
+          margin-top: 50px;
         `;
       
       default:
@@ -96,26 +130,46 @@ const Box = styled.li<BoxDivProps>`
 //#endregion
 
 function Golfzon() {
-  const golfzonRef = useRef<HTMLDivElement>(null);
-  const secondRef = useRef<HTMLLIElement>(null);
-  const [isAtTop, setIsAtTop] = useRecoilState(isViewGolfzonSection);
-  const [isAtSecondTop, setIsAtSecondTop] = useRecoilState(isSecondView);
-  const [isAtThirdTop, setIsAtThirdTop] = useRecoilState(isThirdView);
+  const rankWrapRef = useRef<HTMLDivElement>(null);
+  const firstBoxRef = useRef<HTMLLIElement>(null);
+  const secondBoxRef = useRef<HTMLLIElement>(null);
+  const thirdBoxRef = useRef<HTMLLIElement>(null);
+
+  const [isAtTop, setIsAtTop] = useState(false);
+  const [isAtSecondTop, setIsAtSecondTop] = useState(false);
+  const [isAtThirdTop, setIsAtThirdTop] = useState(false);
+
+  const [firstBoxTop, setFirstBoxTop] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
-      if (golfzonRef.current) {
-        const rect = golfzonRef.current.getBoundingClientRect();
-        setIsAtTop(rect.top < 0); // 천장에 닿았는지 확인
-      }
-      if (secondRef.current && !isAtSecondTop) {
-        console.log('oin')
-        const rect = secondRef.current.getBoundingClientRect();
-        const shouldBeFixed = rect.top < 235;
+      if (rankWrapRef.current && firstBoxRef.current) {
+        const rect = rankWrapRef.current.getBoundingClientRect();
+        const rect2 = firstBoxRef.current.getBoundingClientRect();
 
-        // 상태가 변경될 필요가 없으면 업데이트를 하지 않음
+        const shouldBeFixed = rect.top < 0;
+
+        if (shouldBeFixed !== isAtTop) {
+          setFirstBoxTop(rect2.top+'');
+          setIsAtTop(shouldBeFixed);
+        }
+      }
+      if (secondBoxRef.current) {
+        const rect = secondBoxRef.current.getBoundingClientRect();
+        const tmp = Number(firstBoxTop.split('px')[0]) + 40;
+        const shouldBeFixed = rect.top < tmp;
+        console.log(rect, tmp, firstBoxTop)
+
         if (shouldBeFixed !== isAtSecondTop) {
           setIsAtSecondTop(shouldBeFixed);
+        }
+      }
+      if (thirdBoxRef.current) {
+        const rect = thirdBoxRef.current.getBoundingClientRect();
+        const shouldBeFixed = rect.top < 290;
+
+        if (shouldBeFixed !== isAtThirdTop) {
+          setIsAtThirdTop(shouldBeFixed);
         }
       }
     };
@@ -127,20 +181,18 @@ function Golfzon() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [setIsAtTop, setIsAtSecondTop]);
+  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop]);
 
   return (
-    <Wrap ref={golfzonRef}>
+    <Wrap ref={rankWrapRef}>
       <Title isAtTop={isAtTop}>
-        <h1 className={isAtTop ? 'at-top-class' : 'default-class'}>
-          올해 <strong>TOP 랭킹</strong>들을 모아봤어요 !  
-        </h1>
+        <h1>올해 <strong><em></em>TOP 랭킹</strong>들을 모아봤어요 !</h1>
       </Title>
 
       <Content isAtTop={isAtTop}>
-        <Box isAtTop={isAtTop} order="first"></Box>
-        <Box order="second" ref={secondRef} isAtSecondTop={isAtSecondTop}></Box>
-        <Box order="third"></Box>
+        <Box order="first" ref={firstBoxRef} isAtTop={isAtTop} firstBoxTop={firstBoxTop} className='first'></Box>
+        <Box order="second" ref={secondBoxRef} isAtSecondTop={isAtSecondTop}></Box>
+        <Box order="third" ref={thirdBoxRef} isAtThirdTop={isAtThirdTop}></Box>
       </Content>
     </Wrap>
   );

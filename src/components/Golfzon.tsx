@@ -3,27 +3,20 @@ import { useEffect, useRef, useState } from 'react';
 import { Frame } from '../GlobalStyle';
 
 const Wrapper = styled(Frame)`
+  display: flex;
+  flex-direction: column;
   background-color: #03045E;
   color: white;
   height: auto;
 `;
 
 const Decoration = styled.div`
-  position: relative;
+  position: absolute;
   background: url(/images/snow-short.png) no-repeat;
   background-size: contain;
-  margin-top: -55px;
-  margin-left: -45px;
-  height: 100px;
   opacity: 0.5;
-
-  @media (max-width: 768px) {
-    width: calc(100% + 20px);
-  }
-
-  @media (min-width: 769px) {
-    width: calc(100% + 45px);
-  }
+  width: 100%;
+  height: 100px;
 `;
 
 const Container = styled.div<{ isVisible: boolean }>`
@@ -31,6 +24,14 @@ const Container = styled.div<{ isVisible: boolean }>`
   opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
   transition: transform 0.9s ease-out, opacity 0.9s ease-out;
   margin-top: -40px;
+
+  @media (max-width: 768px) {
+    margin: 35px 20px;
+  }
+
+  @media (min-width: 769px) {
+    margin: 55px 45px;
+  }
 `;
 
 const CardContainerWrapper = styled.div`
@@ -233,28 +234,28 @@ function Golfzon() {
   
   return (
     <Wrapper ref={golfzonRef}>
-      <Decoration>
+      <div className='wrapper'>
+        <Decoration></Decoration>
+        <Container isVisible={isVisible}>
+          <h1>올해 골프존은요 !</h1>
 
-      </Decoration>
-      <Container isVisible={isVisible}>
-        <h1>올해 골프존은요 !</h1>
-
-        <CardContainerWrapper>
-          {shapes.map((shape, index) => (
-            <CardContainer key={index} shape={shape} onClick={() => handleFlip(index)}>
-              <Card flipped={flippedCards[index]}>
-                <CardFront>
-                  <CardShape shape={shape} />
-                </CardFront>
-                <CardBack>
-                  <p>뒷면 {index + 1}</p>
-                  <CardShape shape={shape} />
-                </CardBack>
-              </Card>
-            </CardContainer>
-          ))}
-        </CardContainerWrapper>
-      </Container>
+          <CardContainerWrapper>
+            {shapes.map((shape, index) => (
+              <CardContainer key={index} shape={shape} onClick={() => handleFlip(index)}>
+                <Card flipped={flippedCards[index]}>
+                  <CardFront>
+                    <CardShape shape={shape} />
+                  </CardFront>
+                  <CardBack>
+                    <p>뒷면 {index + 1}</p>
+                    <CardShape shape={shape} />
+                  </CardBack>
+                </Card>
+              </CardContainer>
+            ))}
+          </CardContainerWrapper>
+        </Container>
+      </div>
     </Wrapper>
   );
 }
