@@ -11,6 +11,7 @@ interface BoxDivProps {
   isAtSecondTop?: boolean;
   isAtThirdTop?: boolean;
   firstBoxTop?: string;
+  thirdBoxTop?: string;
   order: 'first' | 'second' | 'third'
 }
 //#endregion
@@ -78,11 +79,6 @@ const Content = styled.ul<StickyDivProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* margin-top: 220px; */
-  /* top: 50%; */
-  /* margin-top: auto; */
-  /* margin-top: ${({ isAtTop }) => (isAtTop ? "220px" : "170px")}; */
-  /* position: relative; */
 `;
 const Box = styled.li<BoxDivProps>`
   width: 80%;
@@ -91,35 +87,31 @@ const Box = styled.li<BoxDivProps>`
   border-radius: 20px;
   pointer-events: none;
   user-select: none;
-  
 
   ${({ order, isAtTop, isAtSecondTop, isAtThirdTop, firstBoxTop }) => {
     switch (order) {
       case 'first':
         return `
           background-color: #77CDFF;
-          position: ${isAtTop ? 'fixed' : 'absolute'};
+          position: ${isAtTop ? 'fixed': 'absolute'};
           top: ${isAtTop ? `${firstBoxTop}px` : '10%'};
-          // top: 10%;
-          // top: ${isAtTop ? '358px' : '10%'};
-          // transform: ${isAtTop ? '' : 'translate(-50%, -50%)'}; /* 요소의 중심을 기준으로 이동 */
           z-index: 1;
         `;
       case 'second':
         return `
           background-color: #3993DF;
           position: ${isAtSecondTop ? 'fixed' : 'absolute'};
-          top: ${isAtSecondTop ? '200px' : '720px'};
+          top: ${isAtSecondTop ? `${firstBoxTop}px` : '720px'};
           z-index: 2;
-          margin-top: 40px;
+          margin-top: 50px;
         `;
       case 'third':
         return `
           background-color: #1864A6;
           position: ${isAtThirdTop ? 'fixed' : 'absolute'};
-          top: ${isAtThirdTop ? '240px' : '1440px'};
+          top: ${isAtThirdTop ? `${firstBoxTop}px` : '1440px'};
           z-index: 3;
-          margin-top: 50px;
+          margin-top: 100px;
         `;
       
       default:
@@ -140,36 +132,44 @@ function Golfzon() {
   const [isAtThirdTop, setIsAtThirdTop] = useState(false);
 
   const [firstBoxTop, setFirstBoxTop] = useState('');
+  const [secondBoxTop, setSecondBoxTop] = useState('');
+  const [thirdBoxTop, setThirdBoxTop] = useState('');
+  const [initScrollY, setInitScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       if (rankWrapRef.current && firstBoxRef.current) {
         const rect = rankWrapRef.current.getBoundingClientRect();
         const rect2 = firstBoxRef.current.getBoundingClientRect();
-
         const shouldBeFixed = rect.top < 0;
 
         if (shouldBeFixed !== isAtTop) {
           setFirstBoxTop(rect2.top+'');
           setIsAtTop(shouldBeFixed);
+          setInitScrollY(window.scrollY);
         }
       }
       if (secondBoxRef.current) {
         const rect = secondBoxRef.current.getBoundingClientRect();
-        const tmp = Number(firstBoxTop.split('px')[0]) + 40;
-        const shouldBeFixed = rect.top < tmp;
-        console.log(rect, tmp, firstBoxTop)
+        const secondBoxTop = Number(firstBoxTop.split('px')[0]) + 50;
+        const shouldBeFixed = rect.top < secondBoxTop;
+        const over = rect.top > secondBoxTop;
 
         if (shouldBeFixed !== isAtSecondTop) {
-          setIsAtSecondTop(shouldBeFixed);
+          setIsAtSecondTop(true);
+        }
+        if (over !== isAtSecondTop) {
+          setIsAtSecondTop(false);
         }
       }
-      if (thirdBoxRef.current) {
+      if (rankWrapRef.current && thirdBoxRef.current) {
         const rect = thirdBoxRef.current.getBoundingClientRect();
-        const shouldBeFixed = rect.top < 290;
-
+        const thirdBoxTop = Number(firstBoxTop.split('px')[0]) + (53 * 2);
+        const shouldBeFixed = rect.top < thirdBoxTop;
+        
         if (shouldBeFixed !== isAtThirdTop) {
           setIsAtThirdTop(shouldBeFixed);
+          setThirdBoxTop((window.scrollY - initScrollY)+'');
         }
       }
     };
@@ -181,7 +181,7 @@ function Golfzon() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop]);
+  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, initScrollY]);
 
   return (
     <Wrap ref={rankWrapRef}>
@@ -190,9 +190,25 @@ function Golfzon() {
       </Title>
 
       <Content isAtTop={isAtTop}>
-        <Box order="first" ref={firstBoxRef} isAtTop={isAtTop} firstBoxTop={firstBoxTop} className='first'></Box>
-        <Box order="second" ref={secondBoxRef} isAtSecondTop={isAtSecondTop}></Box>
-        <Box order="third" ref={thirdBoxRef} isAtThirdTop={isAtThirdTop}></Box>
+        <Box
+          order="first"
+          ref={firstBoxRef}
+          isAtTop={isAtTop}
+          firstBoxTop={firstBoxTop}
+        />
+        <Box
+          order="second"
+          ref={secondBoxRef}
+          isAtSecondTop={isAtSecondTop}
+          firstBoxTop={firstBoxTop}
+        />
+        <Box
+          order="third"
+          ref={thirdBoxRef}
+          isAtThirdTop={isAtThirdTop}
+          firstBoxTop={firstBoxTop}
+          thirdBoxTop={thirdBoxTop}
+        />
       </Content>
     </Wrap>
   );
