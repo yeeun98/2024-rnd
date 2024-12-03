@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Frame } from '../GlobalStyle';
 
 //#region props type
@@ -10,8 +10,7 @@ interface BoxDivProps {
   isAtTop?: boolean;
   isAtSecondTop?: boolean;
   isAtThirdTop?: boolean;
-  firstBoxTop?: string;
-  thirdBoxTop?: string;
+  firstBoxTop: string;
   order: 'first' | 'second' | 'third'
 }
 //#endregion
@@ -30,36 +29,31 @@ const Title = styled.h1<StickyDivProps>`
   transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
   text-align: center;
 
-  h1 {
-      strong {
-        position: relative;
-        display: inline-block;
-        border-bottom: 4px solid #FFEE32;
-        padding-bottom: 2px;
+  strong {
+    position: relative;
+    display: inline-block;
+    border-bottom: 4px solid #FFEE32;
+    padding-bottom: 2px;
 
-        em {
-          position: absolute;
-          background: url(/images/highlight.png) no-repeat;
-          background-size: contain;
-          height: 22px;
-          aspect-ratio: 1.5 /1;
-          left: -15px;
-          top: -22px;
-        }
-      }
+    em {
+      position: absolute;
+      background: url(/images/highlight.png) no-repeat;
+      background-size: contain;
+      height: 22px;
+      aspect-ratio: 1.5 /1;
+      left: -15px;
+      top: -22px;
     }
+  }
 
   @media (max-width: 768px) {
     margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "100px")};
     top: ${({ isAtTop }) => (isAtTop ? "100px" : "auto")};
-
-    h1 {
-      font-size: 23px;
-      
-      strong {
-        font-weight: 900;
-        font-size: 24px;
-      }
+    font-size: 23px;
+    
+    strong {
+      font-weight: 900;
+      font-size: 24px;
     }
   }
 
@@ -67,11 +61,9 @@ const Title = styled.h1<StickyDivProps>`
     margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "150px")};
     top: ${({ isAtTop }) => (isAtTop ? "150px" : "auto")};
 
-    h1 {
-      strong {
-        font-weight: 900;
-        font-size: 36px;
-      }
+    strong {
+      font-weight: 900;
+      font-size: 36px;
     }
   }
 `;
@@ -101,7 +93,7 @@ const Box = styled.li<BoxDivProps>`
         return `
           background-color: #3993DF;
           position: ${isAtSecondTop ? 'fixed' : 'absolute'};
-          top: ${isAtSecondTop ? `${firstBoxTop}px` : '720px'};
+          top: ${isAtSecondTop ? `${firstBoxTop}px` : '100vh'};
           z-index: 2;
           margin-top: 50px;
         `;
@@ -109,7 +101,7 @@ const Box = styled.li<BoxDivProps>`
         return `
           background-color: #1864A6;
           position: ${isAtThirdTop ? 'fixed' : 'absolute'};
-          top: ${isAtThirdTop ? `${firstBoxTop}px` : '1440px'};
+          top: ${isAtThirdTop ? `${firstBoxTop}px` : '200vh'};
           z-index: 3;
           margin-top: 100px;
         `;
@@ -130,47 +122,70 @@ function Golfzon() {
   const [isAtTop, setIsAtTop] = useState(false);
   const [isAtSecondTop, setIsAtSecondTop] = useState(false);
   const [isAtThirdTop, setIsAtThirdTop] = useState(false);
+  const [isShowSection, setIsShowSection] = useState(false);
 
   const [firstBoxTop, setFirstBoxTop] = useState('');
-  const [secondBoxTop, setSecondBoxTop] = useState('');
-  const [thirdBoxTop, setThirdBoxTop] = useState('');
-  const [initScrollY, setInitScrollY] = useState(0);
+  
+  const scrollEvent = ()=> {
+    // 현재 화면 높이를 가져옵니다.
+    const viewportHeight = window.innerHeight;
+  
+    // 250vh 값을 계산합니다.
+    const vhValue = viewportHeight * 2.5 * 0.1;
+
+    if (rankWrapRef.current && firstBoxRef.current) {
+      const rect = rankWrapRef.current.getBoundingClientRect();
+      const shouldBeFixed = rect.top <= vhValue;
+      const isShowSection = rect.top <= 0;
+
+      if(!isShowSection) return;
+
+      if(isShowSection) {
+        setIsShowSection(true);
+      }
+      if (shouldBeFixed) {
+        setIsAtTop(true);
+        setFirstBoxTop(vhValue.toString());
+      } else {
+        setIsAtTop(false);
+        setFirstBoxTop('0');
+      }
+    }
+
+    if (rankWrapRef.current && secondBoxRef.current) {
+      const rect = rankWrapRef.current.getBoundingClientRect();
+      const shouldBeFixed = rect.top <= -viewportHeight + vhValue;
+
+      if (shouldBeFixed) {
+        setIsAtSecondTop(true);
+      } else {
+        setIsAtSecondTop(false);
+      }
+    }
+
+    if (rankWrapRef.current && thirdBoxRef.current) {
+      const rect = rankWrapRef.current.getBoundingClientRect();
+      const shouldBeFixed = rect.top <= (-viewportHeight * 2) + vhValue;
+
+      if (shouldBeFixed) {
+        setIsAtThirdTop(true);
+      } else {
+        setIsAtThirdTop(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (rankWrapRef.current && firstBoxRef.current) {
-        const rect = rankWrapRef.current.getBoundingClientRect();
-        const rect2 = firstBoxRef.current.getBoundingClientRect();
-        const shouldBeFixed = rect.top < 0;
+    let ticking = false;
 
-        if (shouldBeFixed !== isAtTop) {
-          setFirstBoxTop(rect2.top+'');
-          setIsAtTop(shouldBeFixed);
-          setInitScrollY(window.scrollY);
-        }
-      }
-      if (secondBoxRef.current) {
-        const rect = secondBoxRef.current.getBoundingClientRect();
-        const secondBoxTop = Number(firstBoxTop.split('px')[0]) + 50;
-        const shouldBeFixed = rect.top < secondBoxTop;
-        const over = rect.top > secondBoxTop;
-
-        if (shouldBeFixed !== isAtSecondTop) {
-          setIsAtSecondTop(true);
-        }
-        if (over !== isAtSecondTop) {
-          setIsAtSecondTop(false);
-        }
-      }
-      if (rankWrapRef.current && thirdBoxRef.current) {
-        const rect = thirdBoxRef.current.getBoundingClientRect();
-        const thirdBoxTop = Number(firstBoxTop.split('px')[0]) + (53 * 2);
-        const shouldBeFixed = rect.top < thirdBoxTop;
-        
-        if (shouldBeFixed !== isAtThirdTop) {
-          setIsAtThirdTop(shouldBeFixed);
-          setThirdBoxTop((window.scrollY - initScrollY)+'');
-        }
+    const handleScroll = (e: Event) => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          scrollEvent();
+          ticking = false;
+        });
+    
+        ticking = true;
       }
     };
 
@@ -181,12 +196,12 @@ function Golfzon() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, initScrollY]);
+  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection]);
 
   return (
     <Wrap ref={rankWrapRef}>
       <Title isAtTop={isAtTop}>
-        <h1>올해 <strong><em></em>TOP 랭킹</strong>들을 모아봤어요 !</h1>
+        올해 <strong><em></em>TOP 랭킹</strong>들을 모아봤어요 !
       </Title>
 
       <Content isAtTop={isAtTop}>
@@ -207,7 +222,6 @@ function Golfzon() {
           ref={thirdBoxRef}
           isAtThirdTop={isAtThirdTop}
           firstBoxTop={firstBoxTop}
-          thirdBoxTop={thirdBoxTop}
         />
       </Content>
     </Wrap>
