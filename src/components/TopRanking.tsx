@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import React, { useEffect, useRef, useState } from 'react';
 import { Frame } from '../GlobalStyle';
+import { useRecoilValue } from 'recoil';
+import { isShowUserSecton } from '../variable/atom';
 
 //#region props type
 interface StickyDivProps {
@@ -18,7 +20,7 @@ interface BoxDivProps {
 //#region style-component
 const Wrap = styled(Frame)`
   position: relative;
-  min-height: 250dvh;
+  min-height: 300vh;
   overflow: hidden;
 `;
 const Title = styled.h1<StickyDivProps>`
@@ -125,24 +127,32 @@ function Golfzon() {
   const [isShowSection, setIsShowSection] = useState(false);
 
   const [firstBoxTop, setFirstBoxTop] = useState('');
+
+  const showUserSecton = useRecoilValue(isShowUserSecton);
   
   const scrollEvent = ()=> {
     // 현재 화면 높이를 가져옵니다.
     const viewportHeight = window.innerHeight;
   
     // 250vh 값을 계산합니다.
-    const vhValue = viewportHeight * 2.5 * 0.1;
+    const vhValue = Math.ceil(viewportHeight * 3 * 0.1);
 
     if (rankWrapRef.current && firstBoxRef.current) {
       const rect = rankWrapRef.current.getBoundingClientRect();
       const shouldBeFixed = rect.top <= vhValue;
       const isShowSection = rect.top <= 0;
 
-      if(!isShowSection) return;
-
       if(isShowSection) {
         setIsShowSection(true);
+      }else {
+        setIsShowSection(false);
+        setIsAtTop(false);
+        setFirstBoxTop('0');
+        return;
       }
+
+      if(!isShowSection) return;
+
       if (shouldBeFixed) {
         setIsAtTop(true);
         setFirstBoxTop(vhValue.toString());
@@ -172,7 +182,16 @@ function Golfzon() {
       } else {
         setIsAtThirdTop(false);
       }
+
+      // if(showUserSecton) {
+      //   setIsAtTop(false);
+      //   setIsAtSecondTop(false);
+      //   setIsAtThirdTop(false);
+      //   setFirstBoxTop(((-viewportHeight * 2) + vhValue).toString());
+      // }
     }
+
+    
   };
 
   useEffect(() => {
@@ -196,7 +215,7 @@ function Golfzon() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection]);
+  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection, showUserSecton]);
 
   return (
     <Wrap ref={rankWrapRef}>
