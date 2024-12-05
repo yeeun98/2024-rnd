@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Frame } from '../GlobalStyle';
 import { useRecoilValue } from 'recoil';
 import { isShowUserSecton } from '../variable/atom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBestCC } from '../api';
 
 //#region props type
 interface StickyDivProps {
@@ -96,6 +98,7 @@ const Box = styled.li<BoxDivProps>`
           background-color: #3993DF;
           position: ${isAtSecondTop ? 'fixed' : 'absolute'};
           top: ${isAtSecondTop ? `${firstBoxTop}px` : '100vh'};
+          // top: ${isAtSecondTop ? `${firstBoxTop}px` : '100vh'};
           z-index: 2;
           margin-top: 50px;
         `;
@@ -121,6 +124,11 @@ function Golfzon() {
   const secondBoxRef = useRef<HTMLLIElement>(null);
   const thirdBoxRef = useRef<HTMLLIElement>(null);
 
+  const { isLoading, data } = useQuery<IHistorical[]>({
+    queryKey: ['bestCC'],
+    queryFn: () => fetchBestCC()
+  });
+
   const [isAtTop, setIsAtTop] = useState(false);
   const [isAtSecondTop, setIsAtSecondTop] = useState(false);
   const [isAtThirdTop, setIsAtThirdTop] = useState(false);
@@ -131,10 +139,7 @@ function Golfzon() {
   const showUserSecton = useRecoilValue(isShowUserSecton);
   
   const scrollEvent = ()=> {
-    // 현재 화면 높이를 가져옵니다.
     const viewportHeight = window.innerHeight;
-  
-    // 250vh 값을 계산합니다.
     const vhValue = Math.ceil(viewportHeight * 3 * 0.1);
 
     if (rankWrapRef.current && firstBoxRef.current) {
@@ -181,6 +186,7 @@ function Golfzon() {
         setIsAtThirdTop(true);
       } else {
         setIsAtThirdTop(false);
+        return;
       }
 
       // if(showUserSecton) {
@@ -190,8 +196,6 @@ function Golfzon() {
       //   setFirstBoxTop(((-viewportHeight * 2) + vhValue).toString());
       // }
     }
-
-    
   };
 
   useEffect(() => {
