@@ -5,6 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { isShowUserSecton } from '../variable/atom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBestCC } from '../api';
+import { IBestCourse } from '../type';
 
 //#region props type
 interface StickyDivProps {
@@ -124,7 +125,7 @@ function Golfzon() {
   const secondBoxRef = useRef<HTMLLIElement>(null);
   const thirdBoxRef = useRef<HTMLLIElement>(null);
 
-  const { isLoading, data } = useQuery<IHistorical[]>({
+  const { isLoading, data } = useQuery<IBestCourse[]>({
     queryKey: ['bestCC'],
     queryFn: () => fetchBestCC()
   });
