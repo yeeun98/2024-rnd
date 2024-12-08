@@ -64,6 +64,13 @@ export const GlobalStyle = createGlobalStyle`
     font-weight: normal;
     font-style: normal;
   }
+
+  @font-face {
+    font-family: 'GmarketSansBold';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+  }
 `;
 
 export const Frame = styled.section`

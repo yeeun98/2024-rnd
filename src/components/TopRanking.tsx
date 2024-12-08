@@ -10,12 +10,14 @@ import { IBestCourse } from '../type';
 //#region props type
 interface StickyDivProps {
   isAtTop: boolean;
+  titlePosition: number;
 }
 interface BoxDivProps {
   isAtTop?: boolean;
   isAtSecondTop?: boolean;
   isAtThirdTop?: boolean;
   firstBoxTop: string;
+  boxPosition: string[];
   order: 'first' | 'second' | 'third'
 }
 //#endregion
@@ -25,10 +27,21 @@ const Wrap = styled(Frame)`
   position: relative;
   min-height: 300vh;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 23px;
+      
+      strong {
+        font-family: 'GmarketSansMedium', sans-serif; /* 글로벌 폰트 사용 */
+        font-size: 24px;
+      }
+    }
+  }
 `;
 const Title = styled.h1<StickyDivProps>`
   text-align: center;
-  position: ${({ isAtTop }) => (isAtTop ? "fixed" : "static")};
+  position: ${({ isAtTop }) => (isAtTop ? "fixed" : "absolute")};
   width: 100%;
   left: ${({ isAtTop }) => (isAtTop ? "50%" : "auto")};
   transform: ${({ isAtTop }) => (isAtTop ? "translate(-50%, -50%)" : "auto")};
@@ -52,8 +65,7 @@ const Title = styled.h1<StickyDivProps>`
   }
 
   @media (max-width: 768px) {
-    margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "100px")};
-    top: ${({ isAtTop }) => (isAtTop ? "100px" : "auto")};
+    top: ${({ titlePosition }) => (`${titlePosition + 100}px`)};
     font-size: 23px;
     
     strong {
@@ -63,8 +75,7 @@ const Title = styled.h1<StickyDivProps>`
   }
 
   @media (min-width: 769px) {
-    margin-top: ${({ isAtTop }) => (isAtTop ? "0" : "150px")};
-    top: ${({ isAtTop }) => (isAtTop ? "150px" : "auto")};
+    top: ${({ titlePosition }) => (`${titlePosition + 150}px`)};
 
     strong {
       font-weight: 900;
@@ -72,7 +83,7 @@ const Title = styled.h1<StickyDivProps>`
     }
   }
 `;
-const Content = styled.ul<StickyDivProps>`
+const Content = styled.ul`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,29 +96,28 @@ const Box = styled.li<BoxDivProps>`
   pointer-events: none;
   user-select: none;
 
-  ${({ order, isAtTop, isAtSecondTop, isAtThirdTop, firstBoxTop }) => {
+  ${({ order, isAtTop, isAtSecondTop, isAtThirdTop, firstBoxTop, boxPosition }) => {
     switch (order) {
       case 'first':
         return `
           background-color: #77CDFF;
           position: ${isAtTop ? 'fixed': 'absolute'};
-          top: ${isAtTop ? `${firstBoxTop}px` : '10%'};
+          top: ${isAtTop ? `${firstBoxTop}px` : boxPosition[0]};
           z-index: 1;
         `;
       case 'second':
         return `
-          background-color: #3993DF;
+          background-color: #B3FDFE;
           position: ${isAtSecondTop ? 'fixed' : 'absolute'};
-          top: ${isAtSecondTop ? `${firstBoxTop}px` : '100vh'};
-          // top: ${isAtSecondTop ? `${firstBoxTop}px` : '100vh'};
+          top: ${isAtSecondTop ? `${firstBoxTop}px` : boxPosition[1]};
           z-index: 2;
           margin-top: 50px;
         `;
       case 'third':
         return `
-          background-color: #1864A6;
+          background-color: #A5D3F7;
           position: ${isAtThirdTop ? 'fixed' : 'absolute'};
-          top: ${isAtThirdTop ? `${firstBoxTop}px` : '200vh'};
+          top: ${isAtThirdTop ? `${firstBoxTop}px` : boxPosition[2]};
           z-index: 3;
           margin-top: 100px;
         `;
@@ -116,6 +126,73 @@ const Box = styled.li<BoxDivProps>`
         return;
     }
   }}
+
+  div {
+    width: 100%;
+    height: 100%;
+    background: url(/images/ranking/hio.jpg) no-repeat bottom;
+    background-size: contain;
+    padding: 30px 40px;
+    border-radius: 0 0 20px 20px;
+
+    * {
+      font-family: 'GmarketSansBold', sans-serif;
+    }
+
+    h2 {
+      font-size: 22px;
+      text-align: center;
+      
+      @media (max-width: 768px) {
+        margin-bottom: 20px;
+      }
+      
+      @media (min-width: 769px) {
+        margin-bottom: 30px;
+      }
+    }
+
+    ul {
+      li {
+        display: grid;
+        grid-template-columns: 3fr 7fr;
+        grid-template-rows: repeat(2, 1fr);
+        padding: 10px 10px;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        background-color: #444444;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+          height: 60px;
+        }
+        
+        @media (min-width: 769px) {
+          height: 110px;
+        }
+
+        img {
+          grid-row: 1 / -1;
+          grid-column: 1 / 2;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          object-fit: contain;
+        }
+        span {
+          padding-left: 10px;
+          color: #ffffff;
+          font-size: 15px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
 `;
 //#endregion
 
@@ -124,11 +201,7 @@ function Golfzon() {
   const firstBoxRef = useRef<HTMLLIElement>(null);
   const secondBoxRef = useRef<HTMLLIElement>(null);
   const thirdBoxRef = useRef<HTMLLIElement>(null);
-
-  const { isLoading, data } = useQuery<IBestCourse[]>({
-    queryKey: ['bestCC'],
-    queryFn: () => fetchBestCC()
-  });
+  const titleRef = useRef<HTMLHeadingElement>(null);
 
   const [isAtTop, setIsAtTop] = useState(false);
   const [isAtSecondTop, setIsAtSecondTop] = useState(false);
@@ -136,10 +209,21 @@ function Golfzon() {
   const [isShowSection, setIsShowSection] = useState(false);
 
   const [firstBoxTop, setFirstBoxTop] = useState('');
+  const [boxPosition, setBoxPosition] = useState(['10%', '100vh', '200vh']);
+  const [titlePosition, setTitlePosition] = useState(0);
 
   const showUserSecton = useRecoilValue(isShowUserSecton);
+
+  const prevShowUserSection = useRef<boolean | null>(null);
+
+  const { isLoading, data } = useQuery<IBestCourse[]>({
+    queryKey: ['bestCC'],
+    queryFn: () => fetchBestCC()
+  });
   
   const scrollEvent = ()=> {
+    if(showUserSecton) return;
+
     const viewportHeight = window.innerHeight;
     const vhValue = Math.ceil(viewportHeight * 3 * 0.1);
 
@@ -189,13 +273,6 @@ function Golfzon() {
         setIsAtThirdTop(false);
         return;
       }
-
-      // if(showUserSecton) {
-      //   setIsAtTop(false);
-      //   setIsAtSecondTop(false);
-      //   setIsAtThirdTop(false);
-      //   setFirstBoxTop(((-viewportHeight * 2) + vhValue).toString());
-      // }
     }
   };
 
@@ -222,32 +299,79 @@ function Golfzon() {
     };
   }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection, showUserSecton]);
 
+  console.log(isLoading)
+  console.log(data)
+
+  useEffect(() => {
+    if(prevShowUserSection.current !== showUserSecton) {
+      if (prevShowUserSection.current === false && showUserSecton) {
+        if (rankWrapRef.current && titleRef.current) {
+          const rect = rankWrapRef.current.getBoundingClientRect();
+          const titleTopPosition = window.innerWidth <= 768 ? 100 : 150;
+          const titleHeight = titleRef.current.getBoundingClientRect().height;
+          const boxPosition = `${-rect.top + titleTopPosition + titleHeight + (window.innerHeight * 0.1)}px`;
+
+          setTitlePosition(-rect.top);
+          setBoxPosition([boxPosition, boxPosition, boxPosition]);
+          setIsAtTop(false);
+          setIsAtSecondTop(false);
+          setIsAtThirdTop(false);
+        }
+      }else if (prevShowUserSection.current && !showUserSecton) {
+        setTitlePosition(0);
+      }
+    }
+
+    prevShowUserSection.current = showUserSecton;
+  }, [showUserSecton]);
+
   return (
     <Wrap ref={rankWrapRef}>
-      <Title isAtTop={isAtTop}>
+      <Title ref={titleRef} isAtTop={isAtTop} titlePosition={titlePosition}>
         올해 <strong><em></em>TOP 랭킹</strong>들을 모아봤어요 !
       </Title>
 
-      <Content isAtTop={isAtTop}>
+      <Content>
         <Box
           order="first"
           ref={firstBoxRef}
           isAtTop={isAtTop}
           firstBoxTop={firstBoxTop}
-        />
+          boxPosition={boxPosition}
+        ></Box>
         <Box
           order="second"
           ref={secondBoxRef}
           isAtSecondTop={isAtSecondTop}
           firstBoxTop={firstBoxTop}
-        />
+          boxPosition={boxPosition}
+        ></Box>
         <Box
           order="third"
           ref={thirdBoxRef}
           isAtThirdTop={isAtThirdTop}
           firstBoxTop={firstBoxTop}
-        />
-      </Content>
+          boxPosition={boxPosition}
+        >
+          <div>
+            <h2>
+              <strong>최다 홀인원 CC<br/>BEST TOP 3</strong>
+            </h2>
+
+            <ul>
+              {
+                data?.slice(0,3).map((item, idx) => {
+                  return <li key={idx}>
+                    <img src="/images/ranking/camera.png" />
+                    <span>[ {item.ccName} ]</span>
+                    <span>{item.ccName}</span>
+                  </li>
+                }) ?? ''
+              }
+            </ul>
+          </div>
+        </Box>
+      </Content>  
     </Wrap>
   );
 }
