@@ -23,6 +23,7 @@ export interface IYearRound {
 export interface IBestCourse {
   ciCode: number;
   ccName: string;
+  emblemImageUrl: string;
   count: number;
 }
 export interface IUserRank {

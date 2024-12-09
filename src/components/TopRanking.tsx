@@ -55,7 +55,7 @@ const Title = styled.h1<StickyDivProps>`
 
     em {
       position: absolute;
-      background: url(/images/highlight.png) no-repeat;
+      background: url(/images/ranking/highlight.png) no-repeat;
       background-size: contain;
       height: 22px;
       aspect-ratio: 1.5 /1;
@@ -125,75 +125,116 @@ const Box = styled.li<BoxDivProps>`
       default:
         return;
     }
-  }}
+  }} 
+`;
 
-  div {
-    width: 100%;
-    height: 100%;
-    background: url(/images/ranking/hio.jpg) no-repeat bottom;
-    background-size: contain;
-    padding: 30px 40px;
-    border-radius: 0 0 20px 20px;
+const CardInner = styled.div<{order: 'first' | 'second' | 'third'}>`
+  * {
+    font-family: 'GmarketSansBold', sans-serif;
+  }
 
-    * {
-      font-family: 'GmarketSansBold', sans-serif;
-    }
+  width: 100%;
+  height: 100%;
 
-    h2 {
-      font-size: 22px;
-      text-align: center;
+  ${({ order }) => {
+    switch (order) {
+      case 'first':
+        return `
+          background: url(/images/ranking/star-confetti.png) no-repeat top;
+        `;
+      case 'second':
+        return `
+        background: url(/images/ranking/hio.jpg) no-repeat bottom;
+        `;
+      case 'third':
+        return `
+          background: url(/images/ranking/hio.jpg) no-repeat bottom;
+        `;
       
+      default:
+        return;
+    }
+  }} 
+  
+  background-size: contain;
+  padding: 30px 40px;
+  border-radius: 0 0 20px 20px;
+
+  h2 {
+    font-family: 'GmarketSansBold', sans-serif;
+    text-align: center;
+
+    ${({ order }) => {
+    switch (order) {
+      case 'first':
+      case 'third':
+        return `
+          color: #ffffff;
+        `;
+      
+      default:
+        return;
+    }
+  }} 
+    
+    @media (max-width: 768px) {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    
+    @media (min-width: 769px) {
+      margin-top: 10px;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+  }
+
+  ul {
+    li {
+      font-family: 'GmarketSansMedium', sans-serif !important;
+      display: grid;
+      grid-template-columns: 3fr 7fr;
+      grid-template-rows: repeat(2, 1fr);
+      padding: 10px 10px;
+      box-sizing: border-box;
+      background-color: #444444;
+      border-radius: 5px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
       @media (max-width: 768px) {
-        margin-bottom: 20px;
+        height: 60px;
+        margin-bottom: 10px;
       }
       
       @media (min-width: 769px) {
-        margin-bottom: 30px;
-      }
-    }
-
-    ul {
-      li {
-        display: grid;
-        grid-template-columns: 3fr 7fr;
-        grid-template-rows: repeat(2, 1fr);
-        padding: 10px 10px;
-        box-sizing: border-box;
+        height: 100px;
         margin-bottom: 15px;
-        background-color: #444444;
+      }
 
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        @media (max-width: 768px) {
-          height: 60px;
-        }
-        
-        @media (min-width: 769px) {
-          height: 110px;
-        }
-
-        img {
-          grid-row: 1 / -1;
-          grid-column: 1 / 2;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-          object-fit: contain;
-        }
-        span {
-          padding-left: 10px;
-          color: #ffffff;
-          font-size: 15px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+      img {
+        grid-row: 1 / -1;
+        grid-column: 1 / 2;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        object-fit: contain;
+      }
+      span {
+        padding-left: 10px;
+        color: #ffffff;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }
 `;
+
+
 //#endregion
 
 function Golfzon() {
@@ -220,6 +261,10 @@ function Golfzon() {
     queryKey: ['bestCC'],
     queryFn: () => fetchBestCC()
   });
+  const { isLoading: rankingIsLoading, data: rankingData } = useQuery<IBestCourse[]>({
+    queryKey: ['bestCC'],
+    queryFn: () => fetchBestCC()
+  });
   
   const scrollEvent = ()=> {
     if(showUserSecton) return;
@@ -232,6 +277,8 @@ function Golfzon() {
       const shouldBeFixed = rect.top <= vhValue;
       const isShowSection = rect.top <= 0;
 
+      console.log(isShowSection, vhValue)
+
       if(isShowSection) {
         setIsShowSection(true);
       }else {
@@ -241,7 +288,7 @@ function Golfzon() {
         return;
       }
 
-      if(!isShowSection) return;
+      // if(!isShowSection) return;
 
       if (shouldBeFixed) {
         setIsAtTop(true);
@@ -266,7 +313,6 @@ function Golfzon() {
     if (rankWrapRef.current && thirdBoxRef.current) {
       const rect = rankWrapRef.current.getBoundingClientRect();
       const shouldBeFixed = rect.top <= (-viewportHeight * 2) + vhValue;
-
       if (shouldBeFixed) {
         setIsAtThirdTop(true);
       } else {
@@ -299,9 +345,6 @@ function Golfzon() {
     };
   }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection, showUserSecton]);
 
-  console.log(isLoading)
-  console.log(data)
-
   useEffect(() => {
     if(prevShowUserSection.current !== showUserSecton) {
       if (prevShowUserSection.current === false && showUserSecton) {
@@ -319,6 +362,10 @@ function Golfzon() {
         }
       }else if (prevShowUserSection.current && !showUserSecton) {
         setTitlePosition(0);
+        setBoxPosition(['10%', '100vh', '200vh']);
+        setIsAtTop(true);
+        setIsAtSecondTop(true);
+        setIsAtThirdTop(true);
       }
     }
 
@@ -338,24 +385,10 @@ function Golfzon() {
           isAtTop={isAtTop}
           firstBoxTop={firstBoxTop}
           boxPosition={boxPosition}
-        ></Box>
-        <Box
-          order="second"
-          ref={secondBoxRef}
-          isAtSecondTop={isAtSecondTop}
-          firstBoxTop={firstBoxTop}
-          boxPosition={boxPosition}
-        ></Box>
-        <Box
-          order="third"
-          ref={thirdBoxRef}
-          isAtThirdTop={isAtThirdTop}
-          firstBoxTop={firstBoxTop}
-          boxPosition={boxPosition}
         >
-          <div>
+          <CardInner order={'first'}>
             <h2>
-              <strong>최다 홀인원 CC<br/>BEST TOP 3</strong>
+              전국 랭킹 TOP 3<br/>명예의 전당
             </h2>
 
             <ul>
@@ -369,7 +402,57 @@ function Golfzon() {
                 }) ?? ''
               }
             </ul>
-          </div>
+          </CardInner>
+        </Box>
+        <Box
+          order="second"
+          ref={secondBoxRef}
+          isAtSecondTop={isAtSecondTop}
+          firstBoxTop={firstBoxTop}
+          boxPosition={boxPosition}
+        >
+          <CardInner order={'second'}>
+            <h2>
+              올해 인기 CC<br/>BEST TOP 3
+            </h2>
+
+            <ul>
+              {
+                data?.slice(0,3).map((item, idx) => {
+                  return <li key={idx}>
+                    <img src="/images/ranking/camera.png" />
+                    <span>[ {item.ccName} ]</span>
+                    <span>{item.ccName}</span>
+                  </li>
+                }) ?? ''
+              }
+            </ul>
+          </CardInner>
+        </Box>
+        <Box
+          order="third"
+          ref={thirdBoxRef}
+          isAtThirdTop={isAtThirdTop}
+          firstBoxTop={firstBoxTop}
+          boxPosition={boxPosition}
+        >
+          <CardInner order={'third'}>
+            <h2>
+              최다 홀인원 CC<br/>BEST TOP 3
+            </h2>
+
+            <ul>
+              {
+                data?.slice(0,3).map((item, idx) => {
+                  return <li key={idx}>
+                    <img src={item?.emblemImageUrl} />
+                    <span>[ {item.ccName} ]</span>
+                    <span>{item.ccName}</span>
+                  </li>
+                }) ?? ''
+              }
+            </ul>
+          </CardInner>
         </Box>
       </Content>  
     </Wrap>

@@ -67,7 +67,7 @@ export const GlobalStyle = createGlobalStyle`
 
   @font-face {
     font-family: 'GmarketSansBold';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');
     font-weight: 900;
     font-style: normal;
   }
