@@ -20,11 +20,17 @@ export interface IYearRound {
     FADE: number;
   }
 }
-export interface IBestCourse {
+
+interface Common {
   ciCode: number;
   ccName: string;
   emblemImageUrl: string;
+}
+export interface IBestCourse extends Common{
   count: number;
+}
+export interface IHIOTop3 extends Common {
+  holeInOneCount: number;
 }
 export interface IUserRank {
   userNo: number;

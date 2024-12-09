@@ -18,3 +18,6 @@ export function fetchBestCC() {
 export function fetchRanking() {
   return fetches(`${BASE_URL}/ranking`).then((res) => res.json());
 }
+export function fetchHIOTop3() {
+  return fetches(`${BASE_URL}/hole-in-one`).then((res) => res.json());
+}

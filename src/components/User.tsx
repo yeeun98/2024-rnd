@@ -3,14 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Frame } from '../GlobalStyle';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { isShowUserSecton } from '../variable/atom';
+import { useQuery } from '@tanstack/react-query';
+import { IYearRound } from '../type';
+import { fetchUserRound } from '../api';
 
 const Wrap = styled(Frame)`
-  height: 100vh;
-  background-color: #77CDFF;
-
   display: flex;
   flex-direction: column;
   gap: 50px;
+  height: 100vh;
+  background-color: #77CDFF;
 
   @media (max-width: 768px) {
     padding: 35px 20px;
@@ -21,15 +23,20 @@ const Wrap = styled(Frame)`
   }
 
   h1 {
+    position: relative;
+    z-index: 1;
+
     strong {
       position: relative;
+      z-index: 2;
 
       em {
         position: absolute;
+        z-index: -1;
         top: 15px;
         height: 17px;
         background-color: #B9FFCE;
-        width: fit-content;
+        width: 100%;
       }
     }
   }
@@ -58,12 +65,17 @@ const Button = styled.button<{position: 'left' | 'right'}>`
   height: 50px;
   background: ${({ position }) => `url(/image/user/${position}-btn.png) no-repeat center center`};
   background-size: contain;
-  border: none; /* 테두리 제거 */
-  cursor: pointer; /* 커서 스타일 */
-  padding: 0; /* 기본 여백 제거 */
+  border: none;
+  cursor: pointer;
+  padding: 0;
 `;
 
 function TeeShot() {
+  const { data } = useQuery<IYearRound[]>({
+    queryKey: ['yearRound'],
+    queryFn: () => fetchUserRound()
+  });
+
   const userWrapRef = useRef<HTMLDivElement>(null);
   const setIsShowSection = useSetRecoilState(isShowUserSecton);
 
@@ -96,7 +108,7 @@ function TeeShot() {
   return (
     <Wrap ref={userWrapRef}>
       <h1>
-        올해 <strong>[ask]예은동<em></em></strong>님은요 !
+        올해 <strong><em></em>[ask]예은동</strong>님은요 !
       </h1>
 
       <ContentBox>

@@ -75,8 +75,6 @@ export const GlobalStyle = createGlobalStyle`
 
 export const Frame = styled.section`
   @media (max-width: 768px) {
-    /* padding: 35px 20px; */
-
     h1 {
       font-family: 'GmarketSansMedium', sans-serif; /* 글로벌 폰트 사용 */
       font-size: 30px;
@@ -86,8 +84,6 @@ export const Frame = styled.section`
   }
 
   @media (min-width: 769px) {
-    /* padding: 55px 45px; */
-
     h1 {
       font-family: 'GmarketSansMedium', sans-serif; /* 글로벌 폰트 사용 */
       font-size: 35px;

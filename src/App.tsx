@@ -1,5 +1,8 @@
 import styled from 'styled-components';
 import { GlobalStyle } from './GlobalStyle';
+import { useQuery } from '@tanstack/react-query';
+import { IYearRound } from './type';
+import { fetchUserRound } from './api';
 
 import Golfzon from './components/Golfzon';
 import TopRanking from './components/TopRanking';
@@ -13,6 +16,11 @@ const Wrap = styled.div`
 `;
 
 function App() {
+  const { data } = useQuery<IYearRound[]>({
+    queryKey: ['yearRound'],
+    queryFn: () => fetchUserRound()
+  });
+
   return (
     <Wrap>
       <GlobalStyle />
