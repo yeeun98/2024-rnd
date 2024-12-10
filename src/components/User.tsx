@@ -118,6 +118,33 @@ const Card = styled.div`
   border : 3px dashed #000000;
   border-radius: 20px;
 `;
+
+const ChartCard = styled(Card)`
+  display: grid;
+  grid-template-rows: 2fr 8fr;
+
+  section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      font-family: 'GmarketSansBold', sans-serif;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+
+      @media (min-width: 769px) {
+        font-size: 25px;
+      }
+
+      em {
+        color: #00a6fb;
+      }
+    }
+  }
+`;
 //#endregion
 
 type ShotType = keyof IYearRound['shotLog'];
@@ -196,25 +223,22 @@ function TeeShot() {
               </Card>
             </SlideItem>
             <SlideItem>
-              <Card>2 카드</Card>
-            </SlideItem>
-            <SlideItem>
-              <Card>
+              <ChartCard>
+                <section>
+                  <h2><em>구질</em>, 나만의 스윙 패턴은?</h2>
+                </section>
                 <ApexChart 
-                  series={[
-                    {
-                      name:'shot',
-                      data: yearRoundData?.shotLog 
-                        ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
-                            (key) => yearRoundData.shotLog[key] ?? 0
-                          )
-                        : [], // 데이터가 없으면 빈 배열 반환
-                    },
-                  ]}
+                  series={
+                    yearRoundData?.shotLog 
+                    ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
+                        (key) => yearRoundData.shotLog[key] ?? 0
+                      )
+                    : []}
                   options={{
                     chart: {
                       type: 'donut',
                     },
+                    labels: yearRoundData?.shotLog ? Object.keys(yearRoundData.shotLog) : [],
                     responsive: [{
                       breakpoint: 480,
                       options: {
@@ -229,7 +253,40 @@ function TeeShot() {
                   }}
                   type="donut"
                 />
-              </Card>
+              </ChartCard>
+            </SlideItem>
+            <SlideItem>
+              <ChartCard>
+                <section>
+                  <h2><em>구질</em>, 나만의 스윙 패턴은?</h2>
+                </section>
+                <ApexChart 
+                  series={
+                    yearRoundData?.shotLog 
+                    ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
+                        (key) => yearRoundData.shotLog[key] ?? 0
+                      )
+                    : []}
+                  options={{
+                    chart: {
+                      type: 'donut',
+                    },
+                    labels: yearRoundData?.shotLog ? Object.keys(yearRoundData.shotLog) : [],
+                    responsive: [{
+                      breakpoint: 480,
+                      options: {
+                        chart: {
+                          width: 200
+                        },
+                        legend: {
+                          position: 'bottom'
+                        }
+                      }
+                    }]
+                  }}
+                  type="donut"
+                />
+              </ChartCard>
             </SlideItem>
           </Slider>
         </SliderWrapper>
