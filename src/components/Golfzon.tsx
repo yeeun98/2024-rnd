@@ -113,13 +113,15 @@ export const CardContainer = styled.div<{ shape: string }>`
   }}
 `;
 
-export const CardShape = styled.div<{ shape: string }>`
+export const CardShape = styled.div<{ shape: string; isVisible: boolean }>`
   aspect-ratio: 1 / 1;
 
-  ${({ shape }) => {
+  ${({ shape, isVisible }) => {
     switch (shape) {
       case 'circle':
         return `
+          transform: ${isVisible ? "translateY(0)" : "translateY(50px)"};
+          transition: transform 0.5s ease-out, opacity 0.5s ease-out;
           background: url(/images/golfzon/circle.png) no-repeat;
           background-size: contain;
 
@@ -133,11 +135,15 @@ export const CardShape = styled.div<{ shape: string }>`
         `;
       case 'star':
         return `
+          transform: ${isVisible ? "translateY(0)" : "translateY(30px)"};
+          transition: transform 1s ease-out, opacity 1s ease-out;
           background: url(/images/golfzon/star.png) no-repeat;
           background-size: contain;
         `;
       case 'clover':
         return `
+          transform: ${isVisible ? "translateY(0)" : "translateY(50px)"};
+          transition: transform 1.1s ease-out, opacity 1s ease-out;
           background: url(/images/golfzon/clover.png) no-repeat;
           background-size: contain;
           @media (max-width: 768px) {
@@ -211,7 +217,7 @@ function Golfzon() {
         <CardContainerWrapper>
           {shapes.map((shape, index) => (
             <CardContainer key={index} shape={shape}>
-              <CardShape shape={shape} />
+              <CardShape shape={shape} isVisible={isVisible} />
             </CardContainer>
           ))}
         </CardContainerWrapper>

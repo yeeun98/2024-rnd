@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query';
 import styled, { keyframes } from 'styled-components';
+import { IYearRound, UserInfo } from '../type';
+import { fetchUserInfo, fetchUserRound } from '../api';
 
 //#region styled component
-const Wrap = styled.div`
+const Wrap = styled.section`
   position: relative;
   background: url(/images/snow.png) no-repeat top, linear-gradient(#a3dbfd, #b5e4ff 10%,#b5e3fd 10%, #fff, #fff, #fff, #fff,  #fff, #fff, #b5e3fd, #b5e4ff);
   background-size: cover;
@@ -14,7 +17,7 @@ const Wrap = styled.div`
   }
 
   @media (min-width: 769px) {
-    height: 1200px;
+    height: 1250px;
   }
 `;
 const MainImg = styled.div`
@@ -69,10 +72,13 @@ const Title = styled.div`
     margin: -25px auto 0 auto;
   }
 `;
-const Text = styled.p`
+const Text = styled.p<{isReady: boolean}>`
   text-align: center;
   font-family: 'GmarketSansMedium', sans-serif;
   color: #03045E;
+  transform: ${({ isReady }) => isReady ? "translateY(0)" : "translateY(50px)"};
+  opacity: ${({ isReady }) => (isReady ? 1 : 0)};
+  transition: transform 0.9s ease-out, opacity 0.9s ease-out;
   
   @media (max-width: 768px) {
     margin-top: 20%;
@@ -112,19 +118,30 @@ const BottomImg = styled.div`
 //#endregion
 
 function TopSection() {
+  const { isLoading, data: yearRoundData } = useQuery<IYearRound>({
+    queryKey: ['yearRound'],
+    queryFn: () => fetchUserRound()
+  });
+  const { data: userInfoData } = useQuery<UserInfo>({
+    queryKey: ['userInfo'],
+    queryFn: () => fetchUserInfo()
+  });
+  
   return (
     <Wrap>
-      <MainImg>
-        <RightDecoration />
-        <LeftDecoration />
-      </MainImg>
+      <div style={{height: 'auto'}}>
+        <MainImg>
+          <RightDecoration />
+          <LeftDecoration />
+        </MainImg>
 
-      <Title />
+        <Title />
+      </div>
 
-      <Text>
-        이번 한해는 당신에게 어떤 한해였나요?<span className="spaced-br"></span>
-        소중한 순간들로 채워진<span className="spaced-br"></span>
-        당신과의 375일에 감사하며,<span className="spaced-br"></span>
+      <Text isReady={!isLoading}>
+        한 해 잘 마무리 하고 계신가요?<span className="spaced-br"></span><br></br>
+        올해 소중한 순간들로 채워진<span className="spaced-br"></span>
+        {`${userInfoData?.userNickname}님` ?? '당신'}과의 {yearRoundData?.totalPlayDateCount ?? 0}일에 감사하며,<span className="spaced-br"></span>
         2024, 당신과의 순간을 돌아보겠습니다.
       </Text>
 

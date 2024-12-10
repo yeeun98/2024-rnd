@@ -33,7 +33,7 @@ const Wrap = styled(Frame)`
       font-size: 23px;
 
       strong {
-        font-family: 'GmarketSansBold', sans-serif; /* 글로벌 폰트 사용 */
+        font-family: 'GmarketSansBold', sans-serif;
         font-size: 24px;
       }
     }
@@ -277,13 +277,13 @@ function Golfzon() {
   const [isAtSecondTop, setIsAtSecondTop] = useState(false);
   const [isAtThirdTop, setIsAtThirdTop] = useState(false);
   const [isShowSection, setIsShowSection] = useState(false);
+  const [showThisSection, setShowThisSection] = useState(false);
 
   const [firstBoxTop, setFirstBoxTop] = useState('');
   const [boxPosition, setBoxPosition] = useState(['8%', '100vh', '200vh']);
   const [titlePosition, setTitlePosition] = useState(0);
 
   const showUserSecton = useRecoilValue(isShowUserSecton);
-
   const prevShowUserSection = useRef<boolean | null>(null);
 
   const { data: rankingData } = useQuery<IUserRank[]>({
@@ -300,7 +300,7 @@ function Golfzon() {
   });
   
   const scrollEvent = ()=> {
-    if(showUserSecton) return;
+    if(showUserSecton || !showThisSection) return;
 
     const viewportHeight = window.innerHeight;
     const vhValue = Math.ceil(viewportHeight * 3 * 0.08);
@@ -351,20 +351,37 @@ function Golfzon() {
     }
   };
 
+  let ticking = false;
+
+  const handleScroll = (e: Event) => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        scrollEvent();
+        ticking = false;
+      });
+  
+      ticking = true;
+    }
+  };
+
   useEffect(() => {
-    let ticking = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if(entry.isIntersecting) {
+          setShowThisSection(true);
+        } else {
+          setShowThisSection(false);
+        }
+      },
+      { root: null, threshold: 0 }
+    );
 
-    const handleScroll = (e: Event) => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          scrollEvent();
-          ticking = false;
-        });
-    
-        ticking = true;
-      }
-    };
+    if (rankWrapRef.current) {
+      observer.observe(rankWrapRef.current);
+    }
+  }, [showThisSection]);
 
+  useEffect(() => {
     // 스크롤 이벤트 추가
     window.addEventListener('scroll', handleScroll);
 
@@ -372,9 +389,11 @@ function Golfzon() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection, showUserSecton]);
+  }, [setIsAtTop, setIsAtSecondTop, setIsAtThirdTop, firstBoxTop, isShowSection, showUserSecton, showThisSection]);
 
   useEffect(() => {
+    if (!showThisSection) return;
+
     if(prevShowUserSection.current !== showUserSecton) {
       if (prevShowUserSection.current === false && showUserSecton) {
         if (rankWrapRef.current && titleRef.current) {
@@ -399,7 +418,7 @@ function Golfzon() {
     }
 
     prevShowUserSection.current = showUserSecton;
-  }, [showUserSecton]);
+  }, [showUserSecton, showThisSection]);
 
   return (
     <Wrap ref={rankWrapRef}>
@@ -464,7 +483,8 @@ function Golfzon() {
                       }}
                     />
                     <span>[ {item.ccName} ]</span>
-                    <span>플레이 횟수 : {item?.count}</span>
+                    <span>지역 : {item?.address}</span>
+                    <span>플레이 횟수 : {(item?.count ?? 0).toLocaleString()}회</span>
                   </li>
                 }) ?? ''
               }
@@ -495,7 +515,8 @@ function Golfzon() {
                       }}
                     />
                     <span>[ {item.ccName} ]</span>
-                    <span>홀인원 횟수 : {item?.holeInOneCount}</span>
+                    <span>지역 : {item?.address}</span>
+                    <span>홀인원 횟수 : {(item?.holeInOneCount ?? 0).toLocaleString()}회</span>
                   </li>
                 }) ?? ''
               }
