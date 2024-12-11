@@ -1,8 +1,5 @@
 import styled from 'styled-components';
 import { GlobalStyle } from './GlobalStyle';
-import { useQuery } from '@tanstack/react-query';
-import { IYearRound, UserInfo } from './type';
-import { fetchUserInfo, fetchUserRound } from './api';
 
 import Golfzon from './components/Golfzon';
 import TopRanking from './components/TopRanking';
@@ -24,7 +21,7 @@ function App() {
       <Golfzon />
       <TopRanking />
       <User />
-      <TeeShot />
+      {/* <TeeShot /> */}
     </Wrap>
   );
 }

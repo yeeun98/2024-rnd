@@ -9,6 +9,7 @@ import { IYearRound, UserInfo } from '../type';
 import { fetchUserInfo, fetchUserRound } from '../api';
 
 import ApexChart from "react-apexcharts";
+import Single from './user/Single';
 
 //#region styled-component
 const Wrap = styled(Frame)`
@@ -66,6 +67,7 @@ const ContentBox = styled.div`
   position: relative;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 `;
 
 const Button = styled.button`
@@ -113,30 +115,29 @@ const SlideItem = styled.li`
   padding: 20px 20px;
 `;
 const Card = styled.div`
+  display: grid;
+  grid-template-rows: 2fr 8fr;
   width: 100%;
   height: 100%;
   border : 3px dashed #000000;
   border-radius: 20px;
-`;
 
-const ChartCard = styled(Card)`
-  display: grid;
-  grid-template-rows: 2fr 8fr;
-
-  section {
+  title {
     display: flex;
     justify-content: center;
     align-items: center;
 
     h2 {
       font-family: 'GmarketSansBold', sans-serif;
+      line-height: 50px;
+      text-align: center;
 
       @media (max-width: 768px) {
         font-size: 20px;
       }
 
       @media (min-width: 769px) {
-        font-size: 25px;
+        font-size: 35px;
       }
 
       em {
@@ -145,9 +146,56 @@ const ChartCard = styled(Card)`
     }
   }
 `;
+const PlayerCard = styled(Card)`
+  section {
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr repeat(2, 2fr);
+    gap: 15px;
+
+    img {
+      width: 60%;
+      height: 60%;
+    }
+
+    p {
+      font-family: 'SUITE', sans-serif;
+      font-size: 37px;
+      line-height: 55px;
+      text-decoration: underline;
+      text-underline-offset: 8px;
+      text-decoration-color: #6b6a6a;
+
+      @media (min-width: 769px) {
+        margin-top: 30px;
+      }
+    }
+  }
+`;
+const ChartCard = styled(Card)`
+  section {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    padding-top: 30px;
+  }
+
+  .apexcharts-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+`;
 //#endregion
 
 type ShotType = keyof IYearRound['shotLog'];
+type SoftwareType = keyof IYearRound['softwareLog'];
 
 function TeeShot() {
   const userWrapRef = useRef<HTMLDivElement>(null);
@@ -216,76 +264,175 @@ function TeeShot() {
         <SliderWrapper>
           <Slider ref={sliderRef} childrenLength={slideCount}>
             <SlideItem>
-              <Card>
-                {
-                  // yearRoundData?.
-                }
-              </Card>
+              <PlayerCard>
+                
+
+                  {
+                    yearRoundData?.userPlayType?.toLocaleLowerCase() === 'single' ? <Single /> : ''
+                  }
+                
+              </PlayerCard>
             </SlideItem>
             <SlideItem>
               <ChartCard>
-                <section>
+                <title>
                   <h2><em>구질</em>, 나만의 스윙 패턴은?</h2>
-                </section>
+                </title>
+                <section>
                 <ApexChart 
-                  series={
-                    yearRoundData?.shotLog 
-                    ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
-                        (key) => yearRoundData.shotLog[key] ?? 0
-                      )
-                    : []}
-                  options={{
-                    chart: {
-                      type: 'donut',
-                    },
-                    labels: yearRoundData?.shotLog ? Object.keys(yearRoundData.shotLog) : [],
-                    responsive: [{
-                      breakpoint: 480,
-                      options: {
-                        chart: {
-                          width: 200
-                        },
-                        legend: {
-                          position: 'bottom'
-                        }
-                      }
-                    }]
-                  }}
-                  type="donut"
-                />
+  series={[
+    {
+      name: 'Shot Type',
+      data: yearRoundData?.softwareLog 
+        ? (Object.keys(yearRoundData.softwareLog) as SoftwareType[]).map(
+            (key) => yearRoundData.softwareLog[key] ?? 0
+          )
+        : [],
+    },
+  ]}
+  options={{
+    chart: {
+      type: 'bar',
+      // width: '100%',
+      // height: '400px', // 웹에서 기본 높이 크게 설정
+      toolbar: {
+        show: true, // 기본적으로 도구 막대 표시
+      },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        borderRadiusApplication: 'end',
+        horizontal: true,
+        barHeight: '50%',
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: yearRoundData?.softwareLog 
+        ? (Object.keys(yearRoundData.softwareLog) as SoftwareType[]).map(
+            (key) => key ?? ''
+          )
+        : [],
+      labels: {
+        style: {
+          fontSize: '14px', // 웹에서는 폰트 크기 증가
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          fontSize: '14px', // 웹에서는 폰트 크기 증가
+        },
+      },
+    },
+    grid: {
+      padding: {
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10,
+      },
+    },
+    // responsive: [
+    //   {
+    //     breakpoint: 480, // 모바일 환경
+    //     options: {
+    //       chart: {
+    //         width: '80%',
+    //         height: 300, // 모바일 높이 축소
+    //         toolbar: {
+    //           show: false, // 모바일에서는 도구 막대 숨김
+    //         },
+    //       },
+    //       plotOptions: {
+    //         bar: {
+    //           // barHeight: '70%',
+    //         },
+    //       },
+    //       xaxis: {
+    //         labels: {
+    //           style: {
+    //             fontSize: '10px',
+    //           },
+    //         },
+    //       },
+    //       yaxis: {
+    //         labels: {
+    //           style: {
+    //             fontSize: '10px',
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    //   {
+    //     breakpoint: 1024, // 웹 환경 (태블릿 및 데스크톱)
+    //     options: {
+    //       chart: {
+    //         width: '100%',
+    //         height: '100%', // 웹 환경에서 높이를 크게 설정
+    //       },
+    //       xaxis: {
+    //         labels: {
+    //           style: {
+    //             fontSize: '14px', // 웹에서는 폰트 크기 증가
+    //           },
+    //         },
+    //       },
+    //       yaxis: {
+    //         labels: {
+    //           style: {
+    //             fontSize: '14px', // 웹에서는 폰트 크기 증가
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // ],
+  }}
+  type="bar"
+/>
+                </section>
               </ChartCard>
             </SlideItem>
             <SlideItem>
               <ChartCard>
-                <section>
+                <title>
                   <h2><em>구질</em>, 나만의 스윙 패턴은?</h2>
-                </section>
-                <ApexChart 
-                  series={
-                    yearRoundData?.shotLog 
-                    ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
-                        (key) => yearRoundData.shotLog[key] ?? 0
-                      )
-                    : []}
-                  options={{
-                    chart: {
-                      type: 'donut',
-                    },
-                    labels: yearRoundData?.shotLog ? Object.keys(yearRoundData.shotLog) : [],
-                    responsive: [{
-                      breakpoint: 480,
-                      options: {
-                        chart: {
-                          width: 200
+                </title>
+                <section>
+                  <ApexChart
+                    key={1}
+                    series={
+                      yearRoundData?.shotLog 
+                      ? (Object.keys(yearRoundData.shotLog) as ShotType[]).map(
+                          (key) => yearRoundData.shotLog[key] ?? 0
+                        )
+                      : []}
+                    options={{
+                      chart: {
+                        type: 'donut',
+                        // width: '10%', // 최대 크기 설정
+                      },
+                      labels: yearRoundData?.shotLog ? Object.keys(yearRoundData.shotLog) : [],
+                      responsive: [
+                        {
+                          breakpoint: 480,
+                          options: {
+                            legend: {
+                              position: 'bottom',
+                            },
+                          },
                         },
-                        legend: {
-                          position: 'bottom'
-                        }
-                      }
-                    }]
-                  }}
-                  type="donut"
-                />
+                      ],
+                    }}
+                    type="donut"
+                  />
+                </section>
               </ChartCard>
             </SlideItem>
           </Slider>
